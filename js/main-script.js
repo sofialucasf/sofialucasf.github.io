@@ -26,6 +26,7 @@ const diagSpeed = ovniMovingSpeed / Math.sqrt(2);
 const meshList = [];
 
 let bufferZone = 20;
+let heightLeveling = -60;
 let ovniMovingUp = 0;
 let ovniMovingDown = 0;
 let ovniMovingLeft = 0;
@@ -298,7 +299,7 @@ function createGroundFromHeightmap(url, onComplete) {
         meshList.push(mesh);
         mesh.castShadow = true;
         mesh.receiveShadow = true;
-        mesh.position.y = -60;
+        mesh.position.y = heightLeveling;
 
         mesh.getHeightAt = function (x, z) {
             const halfWidth = width/2;
@@ -406,7 +407,7 @@ function createWallFace(p1, p2, p3, p4, material) {
     return new THREE.Mesh(geom, material);
 }  
 
-  function createHouse(){
+  function createHouse(groundMesh){
     // House
     let mesh;
 
@@ -498,7 +499,8 @@ function createWallFace(p1, p2, p3, p4, material) {
     meshList.push(mesh);
     house.add(mesh);
 
-    house.position.set(-120,-10,-40);
+    const height = groundMesh.getHeightAt(-120,-40);
+    house.position.set(-120,height + heightLeveling,-40);
     house.rotateY(Math.PI / 6);
     scene.add(house);
 }
@@ -630,7 +632,7 @@ function createTrees(num,mesh) {
                 continue
             }  
             
-            createTree(width,height -60,length,rot,scalar); 
+            createTree(width,height + heightLeveling,length,rot,scalar); 
         }  
         
     scene.add(trees);
@@ -640,12 +642,18 @@ function toggleOvniPointLights() {
     if (pointLightOn) {
         bottomPointLights.forEach((light, index) => {
             light.intensity = 150;
+            ovniLightsMatLambert.emissiveIntensity = 1;
+            ovniLightsMatPhong.emissiveIntensity = 1;
+            ovniLightsMatToon.emissiveIntensity = 1;
             ovniLightsMaterial.emissiveIntensity = 1;        
         });
     }
     else {
         bottomPointLights.forEach((light, index) => {
             light.intensity = 0;
+            ovniLightsMatLambert.emissiveIntensity = 0;
+            ovniLightsMatPhong.emissiveIntensity = 0;
+            ovniLightsMatToon.emissiveIntensity = 0;
             ovniLightsMaterial.emissiveIntensity = 0;
         });
     }
@@ -822,14 +830,13 @@ function init() {
     createGroundFromHeightmap('heightmap.png', groundMesh => {
         scene.add(groundMesh);
         createTrees(20,groundMesh);
+        createHouse(groundMesh);
     });
     createCameras();
     createSkyDome();
     createMoon();
     createGlobalLight();
-    createHouse();
     createOvni();  
-    
     renderer.setAnimationLoop(() => {
         update();
         render();
@@ -971,4 +978,3 @@ function onKeyUp(event) {
 }
 
 init();
-animate();
