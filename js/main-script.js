@@ -8,10 +8,7 @@ import { VRButton } from 'three/addons/webxr/VRButton.js';
 //////////////////////
 
 let scene, renderer;
-let activeCamera ,perspectiveCamera, stereoCamera, fixedcamera, controls;
-
-let usingPerspectiveCamera = true;
-let usingFixedCamera = false;
+let activeCamera ,perspectiveCamera, controls;
 
 const clock = new THREE.Clock();
 
@@ -232,12 +229,8 @@ function createScene() {
 function createCameras() {
     const aspect = window.innerWidth / window.innerHeight;
     perspectiveCamera = new THREE.PerspectiveCamera(90, aspect, 0.1, 2000);
-    perspectiveCamera.position.set(-160, 50, 200);
-    perspectiveCamera.lookAt(0, 80, 0);
-
-    fixedcamera = new THREE.PerspectiveCamera(90, aspect, 0.1, 2000);
-    fixedcamera.position.set(-150, 150, 150);
-    fixedcamera.lookAt(0, 50, 0);
+    perspectiveCamera.position.set(-150, 150, 150);
+    perspectiveCamera.lookAt(0, 50, 0);
 
     activeCamera = perspectiveCamera;
 }
@@ -550,8 +543,8 @@ function createOvni(){
     ovni.add(ovniCylinder);
 
     spotLight = new THREE.SpotLight(0xffffff, 2, 300, Math.PI / 6, 0.1, 0);
-    spotLight.position.set(0, -10, 0); // Just below the cylinder
-    spotLight.target.position.set(0, -40, 0); // Pointing further down
+    spotLight.position.set(0, -10, 0);
+    spotLight.target.position.set(0, -40, 0);
     spotLight.castShadow = true;
     ovni.add(spotLight);
     ovni.add(spotLight.target);
@@ -949,14 +942,6 @@ function onKeyDown(event) {
             basicOn = true;
             switchMaterial();
             break;
-        case '7':
-            usingFixedCamera = !usingFixedCamera;
-            usingPerspectiveCamera = !usingPerspectiveCamera;
-            if (usingFixedCamera) {
-                activeCamera = fixedcamera;
-            } else {
-                activeCamera = perspectiveCamera;
-            }
     }
 }
 
